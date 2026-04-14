@@ -364,6 +364,7 @@ export default function App() {
   const routeCtaLabel = activePageData?.ctaLabel ?? "View Shop";
   const routeCtaPath = activePageData?.ctaPath ?? "/shop";
 
+<<<<<<< HEAD
   useEffect(() => {
     if (isLoading || mobileNavOpen) {
       document.body.style.overflow = "hidden";
@@ -374,7 +375,6 @@ export default function App() {
 
   /** Solid bar: inner routes, scrolled home, or open mobile menu — avoids mix-blend-difference staying on while scrolling the homepage */
   const navUseSolidBar = !isHomeRoute || scrollY > 12 || mobileNavOpen;
-
 
   return (
     <>
