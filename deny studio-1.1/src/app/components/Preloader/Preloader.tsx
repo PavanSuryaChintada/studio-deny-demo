@@ -6,59 +6,68 @@ interface PreloaderProps {
   onLoadingComplete?: () => void;
 }
 
+const captions = [
+  "CURATING UNIFORMS.",
+  "TAILORING SILHOUETTES.",
+  "REFINING ESSENTIALS.",
+  "PREPARING ARCHIVE.",
+  "LOADING FW26.",
+  "STREETWEAR DEPT."
+];
+
 const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [caption, setCaption] = useState("");
 
   useEffect(() => {
-    const duration = 2400; // Total duration in ms
-    const interval = 20; // Update every 20ms
+    // Pick a random fashion caption on mount
+    setCaption(captions[Math.floor(Math.random() * captions.length)]);
+    
+    const duration = 2400; // Total duration in ms (2.4s)
+    const interval = 20; 
     const totalSteps = duration / interval;
     let currentStep = 0;
 
-    const progressTimer = setInterval(() => {
+    const timer = setInterval(() => {
       currentStep++;
       const nextProgress = Math.min(Math.round((currentStep / totalSteps) * 100), 100);
       setProgress(nextProgress);
       
       if (nextProgress >= 100) {
-        clearInterval(progressTimer);
+        clearInterval(timer);
         setTimeout(() => {
           setIsVisible(false);
           if (onLoadingComplete) onLoadingComplete();
-        }, 400);
+        }, 400); // slight pause when hitting 100% before exiting
       }
     }, interval);
 
-    return () => clearInterval(progressTimer);
+    return () => clearInterval(timer);
   }, [onLoadingComplete]);
 
-  // Animation Variants
+  // Framer Motion Variants
   const containerVariants = {
     exit: {
-      y: "-100%",
-      transition: {
-        duration: 0.9,
-        ease: [0.82, 0, 0.18, 1],
-        delay: 0.2
-      }
+      y: "-100%", // slide the entire preloader up to reveal the app
+      transition: { duration: 0.9, ease: [0.82, 0, 0.18, 1], delay: 0.2 }
     }
   };
 
-  const textVariants = {
-    initial: { opacity: 0, y: 20 },
+  const textRevealVariants = {
+    initial: { opacity: 1 },
     animate: { 
       opacity: 1, 
-      y: 0,
-      transition: { duration: 0.8, ease: "circOut" }
+      transition: { staggerChildren: 0.15, delayChildren: 0.2 } 
     }
   };
 
-  const lineVariants = {
-    initial: { scaleX: 0 },
+  const itemVariants = {
+    initial: { y: "100%", rotate: 2 },
     animate: { 
-      scaleX: 1,
-      transition: { duration: 1.2, ease: "expoOut", delay: 0.3 }
+      y: 0, 
+      rotate: 0,
+      transition: { duration: 0.9, ease: [0.76, 0, 0.24, 1] } 
     }
   };
 
@@ -66,95 +75,51 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="preloader-container"
+          className="preloader-minimal"
           variants={containerVariants}
           initial="initial"
           animate="animate"
           exit="exit"
         >
-          {/* Technical Background */}
-          <div className="technical-grid" />
-          
-          <div className="geo-frame">
-            <div className="geo-frame-top-left" />
-            <div className="geo-frame-top-right" />
-            <div className="geo-frame-bottom-left" />
-            <div className="geo-frame-bottom-right" />
+          {/* Main Logo Typography */}
+          <div className="minimal-logo-wrapper">
+            <motion.div className="minimal-logo" variants={textRevealVariants} initial="initial" animate="animate">
+              <span className="hide-overflow">
+                <motion.span variants={itemVariants} className="logo-word block">
+                  STUDIO
+                </motion.span>
+              </span>
+              <span className="hide-overflow">
+                <motion.span variants={itemVariants} className="logo-word logo-indent block">
+                  DENY
+                </motion.span>
+              </span>
+            </motion.div>
           </div>
 
-          {/* Central Stage */}
-          <div className="main-stage">
-            <div className="logo-container">
-              {/* Measurement lines */}
-              <div className="measurement-lines">
-                <div className="line-v" style={{ left: '0' }} />
-                <div className="line-v" style={{ right: '0' }} />
-                <div className="line-h" style={{ top: '0' }} />
-                <div className="line-h" style={{ bottom: '0' }} />
-              </div>
-
-              <motion.h1 
-                className="brand-text"
-                variants={textVariants}
-              >
-                <span>STUDIO</span>
-                <span style={{ marginLeft: '1.5rem' }}>DENY</span>
-              </motion.h1>
-
-              <motion.div 
-                className="scan-line"
-                animate={{ 
-                  top: ["0%", "100%", "0%"] 
-                }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "linear" 
-                }}
-              />
-            </div>
-
-            <div className="metadata-stage">
-              <motion.div 
-                className="metadata"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                SYSTEM_AUTH: <span className="progress-counter">{progress}%</span>
-              </motion.div>
-              
-              <motion.div 
-                className="metadata"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                style={{ marginTop: '5px' }}
-              >
-                LOC: ARCHIVE_V1.1 // SS26
-              </motion.div>
-            </div>
+          {/* Bottom Bar: Loading Line & Caption */}
+          <div className="minimal-bottom">
+            <motion.div 
+              className="loading-bar-container" 
+              initial={{ scaleX: 0 }} 
+              animate={{ scaleX: 1 }} 
+              transition={{ duration: 1, ease: [0.76, 0, 0.24, 1], delay: 0.5 }}
+            >
+              <div className="loading-bar-fill" style={{ width: `${progress}%` }} />
+            </motion.div>
+            
+            <motion.div 
+              className="minimal-caption" 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <span>{caption}</span>
+              <span className="loading-number">
+                [{progress < 10 ? '0' : ''}{progress}]
+              </span>
+            </motion.div>
           </div>
-
-          {/* Bottom Branding */}
-          <div 
-            className="metadata"
-            style={{ 
-              position: 'absolute', 
-              bottom: '40px', 
-              textAlign: 'center',
-              width: '100%'
-            }}
-          >
-            NOT FOR THE ORDINARY
-          </div>
-
-          {/* Exit Flash */}
-          <motion.div 
-            className="exit-flash"
-            exit={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 0.4 }}
-          />
         </motion.div>
       )}
     </AnimatePresence>
