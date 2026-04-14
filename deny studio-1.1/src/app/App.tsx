@@ -1,7 +1,8 @@
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "motion/react";
-import { Instagram, Facebook, Twitter, ArrowRight, ArrowLeft, ChevronDown, Star } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { Instagram, Facebook, Twitter, ArrowRight, ArrowLeft, ChevronDown, Star, Menu, X } from "lucide-react";
+import { useState, useEffect, useRef, type MouseEvent } from "react";
 import Preloader from "./components/Preloader/Preloader";
+
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -10,6 +11,7 @@ export default function App() {
   const [activeShowcase, setActiveShowcase] = useState("NEW DROP");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const heroParallax = Math.min(scrollY * 0.4, 120);
   const shopRef = useRef<HTMLElement | null>(null);
   const lookbookRef = useRef<HTMLElement | null>(null);
@@ -308,6 +310,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileNavOpen]);
+
+  useEffect(() => {
     if (currentPath === "/new-drop") {
       setActiveShowcase("NEW DROP");
       setCategoriesOpen(false);
@@ -326,11 +337,13 @@ export default function App() {
 
   const navigateTo = (path: string) => {
     if (window.location.pathname === path) return;
+    setMobileNavOpen(false);
     window.history.pushState({}, "", path);
     setCurrentPath(path);
   };
 
   const goBack = () => {
+    setMobileNavOpen(false);
     if (window.history.length > 1) {
       window.history.back();
     } else {
@@ -352,12 +365,16 @@ export default function App() {
   const routeCtaPath = activePageData?.ctaPath ?? "/shop";
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || mobileNavOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-  }, [isLoading]);
+  }, [isLoading, mobileNavOpen]);
+
+  /** Solid bar: inner routes, scrolled home, or open mobile menu — avoids mix-blend-difference staying on while scrolling the homepage */
+  const navUseSolidBar = !isHomeRoute || scrollY > 12 || mobileNavOpen;
+
 
   return (
     <>
@@ -375,53 +392,107 @@ export default function App() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 lg:px-16 py-4 sm:py-6 flex justify-between items-center transition-[background,backdrop-filter] duration-300 ${
-          !isHomeRoute && scrollY > 12 ? "bg-[rgba(10,10,10,0.78)] backdrop-blur-md mix-blend-normal" : "mix-blend-difference"
+        className={`fixed top-0 left-0 right-0 z-[100] flex flex-col transition-[background,backdrop-filter] duration-300 ${
+          navUseSolidBar ? "bg-[rgba(10,10,10,0.82)] backdrop-blur-md mix-blend-normal border-b border-white/[0.06]" : "mix-blend-difference"
         }`}
       >
-        <a
-          href="/"
-          onClick={(e) => {
-            e.preventDefault();
-            navigateTo("/");
-          }}
-          className="tracking-[-0.02em] hover:opacity-80 transition-opacity"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
-          <span className="text-[1.65rem] sm:text-[2.5rem] leading-none">STUDIO DENY</span>
-        </a>
-        <div className="hidden sm:flex gap-8 items-center" style={{ fontFamily: "var(--font-body)" }}>
+        <div className="flex w-full items-center justify-between px-4 sm:px-8 lg:px-16 py-4 sm:py-6">
           <a
-            href="#shop"
+            href="/"
             onClick={(e) => {
               e.preventDefault();
-              navigateHomeSection("shop");
+              setMobileNavOpen(false);
+              navigateTo("/");
             }}
-            className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            className="tracking-[-0.02em] hover:opacity-80 transition-opacity"
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            SHOP
+            <span className="text-[1.65rem] sm:text-[2.5rem] leading-none">STUDIO DENY</span>
           </a>
-          <a
-            href="#lookbook"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateHomeSection("lookbook");
-            }}
-            className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+          <div className="hidden sm:flex gap-6 lg:gap-8 items-center" style={{ fontFamily: "var(--font-body)" }}>
+            <a
+              href="#shop"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateHomeSection("shop");
+              }}
+              className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            >
+              SHOP
+            </a>
+            <a
+              href="#lookbook"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateHomeSection("lookbook");
+              }}
+              className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            >
+              LOOKBOOK
+            </a>
+            <a
+              href="#about"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateHomeSection("about");
+              }}
+              className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            >
+              ABOUT
+            </a>
+          </div>
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-sm sm:hidden -mr-1 text-white hover:bg-white/10 transition-colors"
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-nav-panel"
+            aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileNavOpen((o) => !o)}
           >
-            LOOKBOOK
-          </a>
-          <a
-            href="#about"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateHomeSection("about");
-            }}
-            className="text-sm tracking-wide hover:opacity-60 transition-opacity"
-          >
-            ABOUT
-          </a>
+            {mobileNavOpen ? <X className="h-6 w-6" strokeWidth={1.5} /> : <Menu className="h-6 w-6" strokeWidth={1.5} />}
+          </button>
         </div>
+        {mobileNavOpen ? (
+          <div
+            id="mobile-nav-panel"
+            className="flex flex-col gap-1 border-t border-white/[0.08] px-4 pb-5 pt-2 sm:hidden"
+            style={{ fontFamily: "var(--font-body)" }}
+          >
+            <a
+              href="#shop"
+              className="py-3 text-sm tracking-wide"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileNavOpen(false);
+                navigateHomeSection("shop");
+              }}
+            >
+              SHOP
+            </a>
+            <a
+              href="#lookbook"
+              className="py-3 text-sm tracking-wide"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileNavOpen(false);
+                navigateHomeSection("lookbook");
+              }}
+            >
+              LOOKBOOK
+            </a>
+            <a
+              href="#about"
+              className="py-3 text-sm tracking-wide"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileNavOpen(false);
+                navigateHomeSection("about");
+              }}
+            >
+              ABOUT
+            </a>
+          </div>
+        ) : null}
       </motion.nav>
 
       {isHomeRoute ? (
@@ -1118,238 +1189,386 @@ export default function App() {
           initial={{ y: 120, opacity: 0 }}
           animate={{ y: scrollY > 420 ? 0 : 120, opacity: scrollY > 420 ? 1 : 0 }}
           transition={{ duration: 0.3 }}
-          className="sm:hidden fixed bottom-4 left-4 right-4 z-50 min-h-11 px-6 py-3 border border-[var(--pure-white)] bg-[var(--pure-white)] text-[var(--deep-black)] text-sm tracking-[0.14em] inline-flex items-center justify-center"
+          className="sm:hidden fixed bottom-4 left-4 right-4 z-40 min-h-11 px-6 py-3 border border-[var(--pure-white)] bg-[var(--pure-white)] text-[var(--deep-black)] text-sm tracking-[0.14em] inline-flex items-center justify-center"
           style={{ fontFamily: "var(--font-body)" }}
         >
           SHOP THE DROP
         </motion.a>
       </>
       ) : (
-        <main className="pt-20 sm:pt-24">
-          <div className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 pt-2 pb-4">
-            <button
-              type="button"
-              onClick={goBack}
-              className="inline-flex items-center gap-2 text-xs sm:text-sm tracking-[0.18em] uppercase opacity-70 hover:opacity-100 transition-opacity min-h-11 cursor-pointer active:opacity-80 focus-visible:outline-none focus-visible:opacity-100"
-              style={{ fontFamily: "var(--font-body)" }}
-            >
-              <ArrowLeft className="w-4 h-4" aria-hidden />
-              Back
-            </button>
-          </div>
-
-          <section className="relative min-h-[78vh] sm:min-h-[90vh] overflow-hidden">
-            <motion.div
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9 }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('${activeCategoryData?.hero ?? activePageData?.hero ?? pageCatalog["/shop"].hero}')`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.78)] via-[rgba(0,0,0,0.28)] to-[rgba(0,0,0,0.35)]" />
-            <div className="relative z-10 px-4 sm:px-8 lg:px-16 h-full min-h-[78vh] sm:min-h-[90vh] flex items-end pb-14 sm:pb-20">
-              <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
-                <p className="text-xs sm:text-sm tracking-[0.22em] uppercase opacity-75 mb-3" style={{ fontFamily: "var(--font-body)" }}>
-                  Studio Deny Editorial
-                </p>
-                <h1
-                  className="text-[clamp(2.8rem,12vw,8.5rem)] leading-[0.84] tracking-[-0.045em] uppercase"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {activeCategoryData?.title ?? activePageData?.title ?? "SHOP"}
-                </h1>
-                <p className="text-base sm:text-lg mt-4 max-w-xl opacity-88 leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
-                  {activeCategoryData?.subtitle ?? activePageData?.subtitle ?? "Curated essentials for a clean city uniform."}
-                </p>
-              </motion.div>
-            </div>
-          </section>
-
-          <section className="py-16 sm:py-24 space-y-20 sm:space-y-28">
-            {routeProducts.map((product, idx) => {
-              const imageLeft = idx % 2 === 0;
-              return (
-                <motion.a
-                  key={`${product.name}-${idx}`}
-                  href="/shop"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateTo("/shop");
-                  }}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.75, delay: 0.05 }}
-                  viewport={{ once: true, margin: "-8% 0px" }}
-                  className="group block max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center cursor-pointer"
-                >
-                  <div
-                    className={`relative min-h-[48vh] sm:min-h-[58vh] overflow-hidden ${imageLeft ? "lg:order-1" : "lg:order-2"}`}
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.45)] to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
-                  </div>
-                  <div className={`space-y-5 lg:pl-2 lg:pr-2 ${imageLeft ? "lg:order-2" : "lg:order-1"}`}>
-                    <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase opacity-55" style={{ fontFamily: "var(--font-body)" }}>
-                      {String(idx + 1).padStart(2, "0")}
-                    </p>
-                    <div className="space-y-3">
-                      <h2
-                        className="text-[clamp(1.9rem,6vw,4rem)] leading-[0.95] tracking-[-0.03em] uppercase transition-opacity duration-300 group-hover:opacity-100"
-                        style={{ fontFamily: "var(--font-display)" }}
+        <main className="pt-[4.5rem] sm:pt-[5.5rem]">
+          {(() => {
+            const pageTitle = activeCategoryData?.title ?? activePageData?.title ?? "SHOP";
+            const pageSubtitle =
+              activeCategoryData?.subtitle ?? activePageData?.subtitle ?? "Curated essentials for a clean city uniform.";
+            const galleryImgs = activeCategoryData?.gallery ?? activePageData?.gallery ?? pageCatalog["/shop"].gallery;
+            const [p0, p1, p2, p3] = routeProducts;
+            const routeShop = (e: MouseEvent<HTMLAnchorElement>) => {
+              e.preventDefault();
+              navigateTo("/shop");
+            };
+            return (
+              <>
+                <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 pb-4">
+                  <div className="grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8">
+                    <div className="col-span-12 lg:col-span-8">
+                      <button
+                        type="button"
+                        onClick={goBack}
+                        className="inline-flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase opacity-65 hover:opacity-100 transition-opacity min-h-10 cursor-pointer active:opacity-80 focus-visible:outline-none focus-visible:opacity-100"
+                        style={{ fontFamily: "var(--font-body)" }}
                       >
-                        <span className="bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_1px] bg-[linear-gradient(currentColor,currentColor)]">
-                          {product.name}
-                        </span>
-                      </h2>
-                      <p className="text-sm sm:text-base tracking-[0.16em] uppercase opacity-75" style={{ fontFamily: "var(--font-body)" }}>
-                        {product.price}
-                      </p>
+                        <ArrowLeft className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                        Back
+                      </button>
                     </div>
                   </div>
-                </motion.a>
-              );
-            })}
-          </section>
-
-          <section className="relative min-h-[56vh] sm:min-h-[70vh] overflow-hidden">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-              viewport={{ once: true }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('${(activeCategoryData?.gallery ?? activePageData?.gallery ?? pageCatalog["/shop"].gallery)[0]}')`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[rgba(0,0,0,0.65)] via-[rgba(0,0,0,0.35)] to-transparent" />
-            <div className="relative z-10 min-h-[56vh] sm:min-h-[70vh] flex items-end px-4 sm:px-8 lg:px-16 pb-12 sm:pb-16 max-w-[1560px] mx-auto">
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className="text-[clamp(1.25rem,4vw,2.25rem)] leading-snug tracking-[-0.02em] max-w-xl"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                {routeHighlightCaption}
-              </motion.p>
-            </div>
-          </section>
-
-          <section className="py-20 sm:py-28">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-              className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-14 lg:gap-24"
-            >
-              <div className="space-y-8 max-w-md">
-                <p className="text-xs tracking-[0.22em] uppercase opacity-55" style={{ fontFamily: "var(--font-body)" }}>
-                  Continue
-                </p>
-                <a
-                  href={routeCtaPath}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateTo(routeCtaPath);
-                  }}
-                  className="inline-flex items-center gap-2 text-sm tracking-[0.22em] uppercase opacity-90 hover:opacity-100 transition-opacity min-h-11"
-                  style={{ fontFamily: "var(--font-body)" }}
-                >
-                  {routeCtaLabel} <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-              <div className="space-y-6 lg:text-right lg:ml-auto">
-                <p className="text-xs tracking-[0.2em] uppercase opacity-50" style={{ fontFamily: "var(--font-body)" }}>
-                  Navigate
-                </p>
-                <div className="flex flex-col gap-4">
-                  <a
-                    href="/new-drop"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateTo("/new-drop");
-                    }}
-                    className="text-2xl sm:text-4xl tracking-[-0.02em] uppercase opacity-85 hover:opacity-100 transition-opacity"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    New Drop
-                  </a>
-                  <a
-                    href="/best-selling"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateTo("/best-selling");
-                    }}
-                    className="text-2xl sm:text-4xl tracking-[-0.02em] uppercase opacity-85 hover:opacity-100 transition-opacity"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    Best Selling
-                  </a>
-                  <a
-                    href="/shop"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateTo("/shop");
-                    }}
-                    className="text-2xl sm:text-4xl tracking-[-0.02em] uppercase opacity-85 hover:opacity-100 transition-opacity"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    Shop
-                  </a>
                 </div>
-              </div>
-            </motion.div>
-          </section>
 
-          <footer className="border-t border-[rgba(255,255,255,0.12)] pt-14 sm:pt-16 pb-16 px-4 sm:px-8 lg:px-16">
-            <div className="max-w-[1560px] mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-10">
-              <div>
-                <p className="text-[1.75rem] sm:text-[2rem] leading-none tracking-[-0.02em] mb-3" style={{ fontFamily: "var(--font-display)" }}>
-                  STUDIO DENY
-                </p>
-                <p className="text-xs tracking-[0.18em] uppercase opacity-50" style={{ fontFamily: "var(--font-body)" }}>
-                  Street culture. Refined.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-x-8 gap-y-3 text-xs tracking-[0.16em] uppercase opacity-70" style={{ fontFamily: "var(--font-body)" }}>
-                <a href="#shop" onClick={(e) => { e.preventDefault(); navigateTo("/"); window.setTimeout(() => document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }), 40); }} className="hover:opacity-100 transition-opacity">
-                  Shop
-                </a>
-                <a href="#lookbook" onClick={(e) => { e.preventDefault(); navigateTo("/"); window.setTimeout(() => document.getElementById("lookbook")?.scrollIntoView({ behavior: "smooth" }), 40); }} className="hover:opacity-100 transition-opacity">
-                  Lookbook
-                </a>
-                <a href="#about" onClick={(e) => { e.preventDefault(); navigateTo("/"); window.setTimeout(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }), 40); }} className="hover:opacity-100 transition-opacity">
-                  About
-                </a>
-                <a href="/" onClick={(e) => { e.preventDefault(); navigateTo("/"); }} className="hover:opacity-100 transition-opacity">
-                  Home
-                </a>
-              </div>
-              <div className="flex gap-6 opacity-80">
-                <a href="#" className="hover:opacity-60 transition-opacity" aria-label="Instagram">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a href="#" className="hover:opacity-60 transition-opacity" aria-label="Twitter">
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="hover:opacity-60 transition-opacity" aria-label="Facebook">
-                  <Facebook className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-            <p className="max-w-[1560px] mx-auto mt-12 text-[11px] tracking-[0.14em] uppercase opacity-35" style={{ fontFamily: "var(--font-body)" }}>
-              © 2026 Studio Deny. All rights reserved.
-            </p>
-          </footer>
+                {/* Masthead — text-only, grid-aligned */}
+                <section className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 pb-6 sm:pb-8">
+                  <div className="grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-3">
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.65 }}
+                      className="col-span-12 lg:col-span-7"
+                    >
+                      <p className="text-[10px] sm:text-xs tracking-[0.26em] uppercase opacity-55 mb-2" style={{ fontFamily: "var(--font-body)" }}>
+                        Studio Deny
+                      </p>
+                      <h1
+                        className="text-[clamp(2rem,9vw,4.5rem)] leading-[0.92] tracking-[-0.035em] uppercase"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
+                        {pageTitle}
+                      </h1>
+                    </motion.div>
+                    <motion.p
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.65, delay: 0.08 }}
+                      className="col-span-12 lg:col-span-5 lg:self-end text-sm sm:text-base leading-[1.55] opacity-82 tracking-[0.02em]"
+                      style={{ fontFamily: "var(--font-body)" }}
+                    >
+                      {pageSubtitle}
+                    </motion.p>
+                  </div>
+                </section>
+
+                {/* Bento: feature tile — dominant product + overlay */}
+                {p0 && (
+                  <section className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 pb-4 sm:pb-5">
+                    <motion.a
+                      href="/shop"
+                      onClick={routeShop}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8 }}
+                      viewport={{ once: true, margin: "-5% 0px" }}
+                      className="group relative block overflow-hidden min-h-[52vh] sm:min-h-[58vh] lg:min-h-[62vh]"
+                    >
+                      <img
+                        src={p0.image}
+                        alt={p0.name}
+                        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[1000ms] ease-out group-hover:scale-[1.03]"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.82)] via-[rgba(0,0,0,0.2)] to-[rgba(0,0,0,0.35)] transition-opacity duration-500 group-hover:opacity-95" />
+                      <div className="relative z-10 flex h-full min-h-[52vh] sm:min-h-[58vh] lg:min-h-[62vh] flex-col justify-end p-5 sm:p-7 lg:p-8">
+                        <p className="text-[10px] tracking-[0.28em] uppercase opacity-55 mb-2" style={{ fontFamily: "var(--font-body)" }}>
+                          Featured
+                        </p>
+                        <h2
+                          className="text-[clamp(1.85rem,6vw,3.5rem)] leading-[0.98] tracking-[-0.03em] uppercase max-w-[90%]"
+                          style={{ fontFamily: "var(--font-display)" }}
+                        >
+                          {p0.name}
+                        </h2>
+                        <p className="text-xs sm:text-sm tracking-[0.16em] uppercase opacity-72 mt-2" style={{ fontFamily: "var(--font-body)" }}>
+                          {p0.price}
+                        </p>
+                      </div>
+                    </motion.a>
+                  </section>
+                )}
+
+                {/* Bento: asymmetric supporting row (7 + 5) */}
+                {(p1 || p2) && (
+                  <section className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 pb-4 sm:pb-5">
+                    <div className="grid grid-cols-12 gap-3 sm:gap-4 lg:gap-5">
+                      {p1 && (
+                        <motion.a
+                          href="/shop"
+                          onClick={routeShop}
+                          initial={{ opacity: 0, y: 18 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.7 }}
+                          viewport={{ once: true, margin: "-5% 0px" }}
+                          className="group col-span-12 lg:col-span-7 flex flex-col"
+                        >
+                          <div className="relative aspect-[3/4] overflow-hidden">
+                            <img
+                              src={p1.image}
+                              alt={p1.name}
+                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.03]"
+                            />
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.35)] to-transparent opacity-80 group-hover:opacity-65 transition-opacity duration-500" />
+                          </div>
+                          <div className="mt-3 flex items-end justify-between gap-4">
+                            <h3 className="text-[clamp(1.15rem,3.5vw,1.75rem)] leading-tight tracking-[-0.02em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+                              {p1.name}
+                            </h3>
+                            <p className="text-[11px] sm:text-xs tracking-[0.14em] uppercase opacity-65 shrink-0" style={{ fontFamily: "var(--font-body)" }}>
+                              {p1.price}
+                            </p>
+                          </div>
+                        </motion.a>
+                      )}
+                      <div className="col-span-12 lg:col-span-5 flex flex-col gap-3 sm:gap-4">
+                        {p2 && (
+                          <motion.a
+                            href="/shop"
+                            onClick={routeShop}
+                            initial={{ opacity: 0, y: 18 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, delay: 0.05 }}
+                            viewport={{ once: true, margin: "-5% 0px" }}
+                            className="group flex flex-col"
+                          >
+                            <div className="relative aspect-[4/5] overflow-hidden">
+                              <img
+                                src={p2.image}
+                                alt={p2.name}
+                                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.03]"
+                              />
+                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.3)] to-transparent opacity-75 group-hover:opacity-60 transition-opacity duration-500" />
+                            </div>
+                            <div className="mt-2.5 flex items-end justify-between gap-3">
+                              <h3 className="text-[clamp(1rem,3vw,1.45rem)] leading-tight tracking-[-0.015em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+                                {p2.name}
+                              </h3>
+                              <p className="text-[10px] sm:text-[11px] tracking-[0.14em] uppercase opacity-65 shrink-0" style={{ fontFamily: "var(--font-body)" }}>
+                                {p2.price}
+                              </p>
+                            </div>
+                          </motion.a>
+                        )}
+                        {galleryImgs[1] && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.65, delay: 0.08 }}
+                            viewport={{ once: true }}
+                            className="relative aspect-[16/11] overflow-hidden hidden sm:block"
+                          >
+                            <img src={galleryImgs[1]} alt="" className="absolute inset-0 h-full w-full object-cover opacity-90" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[rgba(0,0,0,0.35)]" />
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {/* Bento: wide cinematic tile */}
+                {p3 && (
+                  <section className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 pb-4 sm:pb-5">
+                    <motion.a
+                      href="/shop"
+                      onClick={routeShop}
+                      initial={{ opacity: 0, y: 18 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.7 }}
+                      viewport={{ once: true, margin: "-5% 0px" }}
+                      className="group relative block overflow-hidden col-span-12"
+                    >
+                      <div className="relative aspect-[21/10] sm:aspect-[2/1] min-h-[200px] overflow-hidden">
+                        <img
+                          src={p3.image}
+                          alt={p3.name}
+                          className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-[1.025]"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[rgba(0,0,0,0.45)] to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-500" />
+                        <div className="absolute bottom-0 left-0 p-4 sm:p-6 max-w-[85%]">
+                          <h3 className="text-[clamp(1.25rem,4vw,2.25rem)] leading-[1.05] tracking-[-0.025em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+                            {p3.name}
+                          </h3>
+                          <p className="text-[11px] sm:text-xs tracking-[0.15em] uppercase opacity-75 mt-1" style={{ fontFamily: "var(--font-body)" }}>
+                            {p3.price}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.a>
+                  </section>
+                )}
+
+                {/* Atmospheric band — gallery + caption (no box) */}
+                <section className="relative min-h-[32vh] sm:min-h-[40vh] overflow-hidden mt-2">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                    viewport={{ once: true }}
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url('${galleryImgs[0]}')` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[rgba(0,0,0,0.7)] via-[rgba(0,0,0,0.35)] to-transparent" />
+                  <div className="relative z-10 min-h-[32vh] sm:min-h-[40vh] flex items-end">
+                    <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-8 lg:px-14 pb-7 sm:pb-9">
+                      <div className="grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8">
+                        <motion.p
+                          initial={{ opacity: 0, y: 12 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.75 }}
+                          viewport={{ once: true }}
+                          className="col-span-12 lg:col-span-7 text-[clamp(1rem,2.8vw,1.65rem)] leading-[1.2] tracking-[-0.018em]"
+                          style={{ fontFamily: "var(--font-display)" }}
+                        >
+                          {routeHighlightCaption}
+                        </motion.p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="py-10 sm:py-12">
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7 }}
+                    viewport={{ once: true }}
+                    className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14"
+                  >
+                    <div className="grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-8 lg:gap-y-0">
+                      <div className="col-span-12 lg:col-span-5 space-y-3">
+                        <p className="text-[10px] tracking-[0.22em] uppercase opacity-50" style={{ fontFamily: "var(--font-body)" }}>
+                          Continue
+                        </p>
+                        <a
+                          href={routeCtaPath}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigateTo(routeCtaPath);
+                          }}
+                          className="inline-flex items-center gap-2 text-xs sm:text-sm tracking-[0.2em] uppercase opacity-90 hover:opacity-100 transition-opacity min-h-10"
+                          style={{ fontFamily: "var(--font-body)" }}
+                        >
+                          {routeCtaLabel} <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                      <div className="col-span-12 lg:col-span-5 lg:col-start-8 space-y-3 lg:text-right">
+                        <p className="text-[10px] tracking-[0.2em] uppercase opacity-45" style={{ fontFamily: "var(--font-body)" }}>
+                          Navigate
+                        </p>
+                        <div className="flex flex-col gap-2 lg:items-end">
+                          <a
+                            href="/new-drop"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigateTo("/new-drop");
+                            }}
+                            className="text-[1.45rem] sm:text-[1.85rem] tracking-[-0.02em] uppercase opacity-88 hover:opacity-100 transition-opacity leading-tight"
+                            style={{ fontFamily: "var(--font-display)" }}
+                          >
+                            New Drop
+                          </a>
+                          <a
+                            href="/best-selling"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigateTo("/best-selling");
+                            }}
+                            className="text-[1.45rem] sm:text-[1.85rem] tracking-[-0.02em] uppercase opacity-88 hover:opacity-100 transition-opacity leading-tight"
+                            style={{ fontFamily: "var(--font-display)" }}
+                          >
+                            Best Selling
+                          </a>
+                          <a
+                            href="/shop"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigateTo("/shop");
+                            }}
+                            className="text-[1.45rem] sm:text-[1.85rem] tracking-[-0.02em] uppercase opacity-88 hover:opacity-100 transition-opacity leading-tight"
+                            style={{ fontFamily: "var(--font-display)" }}
+                          >
+                            Shop
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </section>
+
+                <footer className="border-t border-[rgba(255,255,255,0.12)] pt-8 sm:pt-10 pb-10">
+                  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14">
+                    <div className="grid grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-8 items-end">
+                      <div className="col-span-12 md:col-span-4">
+                        <p className="text-[1.6rem] sm:text-[1.85rem] leading-none tracking-[-0.02em] mb-2" style={{ fontFamily: "var(--font-display)" }}>
+                          STUDIO DENY
+                        </p>
+                        <p className="text-[10px] tracking-[0.2em] uppercase opacity-48" style={{ fontFamily: "var(--font-body)" }}>
+                          Street culture. Refined.
+                        </p>
+                      </div>
+                      <div className="col-span-12 md:col-span-5 md:col-start-5 flex flex-wrap gap-x-6 gap-y-2 text-[10px] sm:text-xs tracking-[0.18em] uppercase opacity-68" style={{ fontFamily: "var(--font-body)" }}>
+                        <a
+                          href="#shop"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigateTo("/");
+                            window.setTimeout(() => document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }), 40);
+                          }}
+                          className="hover:opacity-100 transition-opacity"
+                        >
+                          Shop
+                        </a>
+                        <a
+                          href="#lookbook"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigateTo("/");
+                            window.setTimeout(() => document.getElementById("lookbook")?.scrollIntoView({ behavior: "smooth" }), 40);
+                          }}
+                          className="hover:opacity-100 transition-opacity"
+                        >
+                          Lookbook
+                        </a>
+                        <a
+                          href="#about"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigateTo("/");
+                            window.setTimeout(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }), 40);
+                          }}
+                          className="hover:opacity-100 transition-opacity"
+                        >
+                          About
+                        </a>
+                        <a href="/" onClick={(e) => { e.preventDefault(); navigateTo("/"); }} className="hover:opacity-100 transition-opacity">
+                          Home
+                        </a>
+                      </div>
+                      <div className="col-span-12 md:col-span-3 md:col-start-10 flex gap-5 md:justify-end opacity-75">
+                        <a href="#" className="hover:opacity-60 transition-opacity" aria-label="Instagram">
+                          <Instagram className="w-[18px] h-[18px]" />
+                        </a>
+                        <a href="#" className="hover:opacity-60 transition-opacity" aria-label="Twitter">
+                          <Twitter className="w-[18px] h-[18px]" />
+                        </a>
+                        <a href="#" className="hover:opacity-60 transition-opacity" aria-label="Facebook">
+                          <Facebook className="w-[18px] h-[18px]" />
+                        </a>
+                      </div>
+                    </div>
+                    <p className="mt-8 pt-6 border-t border-[rgba(255,255,255,0.08)] text-[10px] tracking-[0.16em] uppercase opacity-32" style={{ fontFamily: "var(--font-body)" }}>
+                      © 2026 Studio Deny. All rights reserved.
+                    </p>
+                  </div>
+                </footer>
+              </>
+            );
+          })()}
         </main>
       )}
       </motion.div>
