@@ -1,9 +1,31 @@
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform, useSpring } from "motion/react";
 import { Instagram, Facebook, Twitter, ArrowRight, ChevronDown, Star } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function App() {
   const [scrollY, setScrollY] = useState(0);
+  const heroParallax = Math.min(scrollY * 0.4, 120);
+  const lookbookRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress: lookbookProgress } = useScroll({
+    target: lookbookRef,
+    offset: ["start end", "end start"],
+  });
+  const lookbookParallaxA = useSpring(useTransform(lookbookProgress, [0, 1], [-30, 90]), {
+    stiffness: 100,
+    damping: 26,
+  });
+  const lookbookParallaxB = useSpring(useTransform(lookbookProgress, [0, 1], [-20, 72]), {
+    stiffness: 100,
+    damping: 26,
+  });
+  const lookbookTextA = useSpring(useTransform(lookbookProgress, [0, 1], [-40, 28]), {
+    stiffness: 120,
+    damping: 30,
+  });
+  const lookbookTextB = useSpring(useTransform(lookbookProgress, [0, 1], [40, -24]), {
+    stiffness: 120,
+    damping: 30,
+  });
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -44,7 +66,7 @@ export default function App() {
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1762666168682-8229f2a62305?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920')`,
             filter: "blur(8px) brightness(0.4)",
-            transform: `translateY(${scrollY * 0.5}px)`,
+            transform: `translateY(${heroParallax}px)`,
           }}
         />
 
@@ -116,141 +138,234 @@ export default function App() {
         </motion.div>
       </section>
 
-      {/* Social Proof Strip */}
-      <section className="px-4 sm:px-8 lg:px-16 py-6 sm:py-8 border-y border-[var(--gray-800)] bg-[rgba(255,255,255,0.01)]">
-        <div className="max-w-[1320px] mx-auto flex flex-wrap items-center justify-between gap-4 sm:gap-6">
-          <p className="text-xs sm:text-sm tracking-[0.15em] opacity-70" style={{ fontFamily: "var(--font-body)" }}>
-            TRUSTED BY CREATORS WORLDWIDE
-          </p>
-          <div className="flex flex-wrap items-center gap-4 sm:gap-8 opacity-75 text-xs sm:text-sm tracking-[0.15em]">
-            {["HYPEFRAME", "VOID MAG", "STREET PULSE", "CUT CULTURE"].map((logo) => (
-              <span key={logo} style={{ fontFamily: "var(--font-body)" }}>
-                {logo}
-              </span>
-            ))}
-          </div>
-        </div>
+      {/* Editorial Marquee */}
+      <section className="py-5 sm:py-6 border-y border-[rgba(255,255,255,0.16)] overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+          className="whitespace-nowrap flex gap-8 sm:gap-12 text-xs sm:text-sm tracking-[0.2em] uppercase opacity-70"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          {Array.from({ length: 3 }).map((_, row) => (
+            <span key={row} className="inline-flex gap-8 sm:gap-12">
+              <span>STUDIO DENY</span>
+              <span>NEW SEASON</span>
+              <span>LIMITED EDITION</span>
+              <span>URBAN TAILORING</span>
+              <span>STREET LUXE</span>
+              <span>STUDIO DENY</span>
+              <span>NEW SEASON</span>
+            </span>
+          ))}
+        </motion.div>
       </section>
 
       {/* Collection Section */}
-      <section id="shop" className="py-14 sm:py-20 px-4 sm:px-8 lg:px-16">
+      <section id="shop" className="relative py-16 sm:py-24">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="max-w-[1320px] mx-auto"
+          className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16"
         >
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-12">
-            <div>
-              <h2
-                className="text-[clamp(2rem,8vw,4.5rem)] leading-none tracking-[-0.03em] uppercase"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                LATEST DROP
-              </h2>
-              <p className="text-base sm:text-lg mt-3 opacity-80 max-w-xl" style={{ fontFamily: "var(--font-body)" }}>
-                New-season essentials designed for movement, comfort, and statement layering.
-              </p>
-            </div>
-            <a
-              href="#cta-end"
-              className="inline-flex items-center gap-2 text-sm tracking-[0.15em] opacity-80 hover:opacity-100 transition-opacity"
-              style={{ fontFamily: "var(--font-body)" }}
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 sm:gap-10 lg:gap-14 items-end">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+              viewport={{ once: true }}
+              className="relative min-h-[62vh] sm:min-h-[78vh] overflow-hidden"
             >
-              GET EARLY ACCESS <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
+              <img
+                src="https://images.unsplash.com/photo-1675079506513-f0a5eb0fd788?w=1800&q=80"
+                alt="Studio Deny editorial look"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.7)] via-transparent to-[rgba(0,0,0,0.2)]" />
+              <div className="absolute bottom-6 sm:bottom-10 left-4 sm:left-8">
+                <h2
+                  className="text-[clamp(2.3rem,9vw,7rem)] leading-[0.88] tracking-[-0.04em] uppercase"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  NEW
+                  <br />
+                  SEASON
+                </h2>
+              </div>
+            </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {[
-              {
-                img: "https://images.unsplash.com/photo-1552337480-48918be048b9?w=800&q=80",
-                name: "ESSENTIALS HOODIE",
-                price: "$120",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1559590450-fc29d6207936?w=800&q=80",
-                name: "SIGNATURE BLACK",
-                price: "$95",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1673118306649-a74a253c5733?w=800&q=80",
-                name: "OVERSIZED TEE",
-                price: "$65",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1718340803554-3a7af7253aa8?w=800&q=80",
-                name: "PREMIUM JOGGERS",
-                price: "$110",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1675079506513-f0a5eb0fd788?w=800&q=80",
-                name: "STUDIO JACKET",
-                price: "$180",
-              },
-              {
-                img: "https://images.unsplash.com/photo-1620223765052-d38678bcce1a?w=800&q=80",
-                name: "WINDBREAKER",
-                price: "$150",
-              },
-            ].map((product, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="group cursor-pointer"
+            <div className="space-y-8 sm:space-y-10">
+              <p className="text-xs tracking-[0.2em] uppercase opacity-70" style={{ fontFamily: "var(--font-body)" }}>
+                Curated staples. Clean cuts. Distinct silhouettes.
+              </p>
+              {[
+                { name: "ESSENTIALS HOODIE", price: "$120" },
+                { name: "SIGNATURE BLACK", price: "$95" },
+                { name: "OVERSIZED TEE", price: "$65" },
+                { name: "PREMIUM JOGGERS", price: "$110" },
+                { name: "STUDIO JACKET", price: "$180" },
+              ].map((product, idx) => (
+                <motion.div
+                  key={product.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: idx * 0.08 }}
+                  viewport={{ once: true }}
+                  className="flex items-end justify-between border-b border-[rgba(255,255,255,0.22)] pb-3"
+                >
+                  <h3 className="text-lg sm:text-2xl tracking-[-0.01em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+                    {product.name}
+                  </h3>
+                  <p className="text-sm tracking-[0.15em] opacity-75" style={{ fontFamily: "var(--font-body)" }}>
+                    {product.price}
+                  </p>
+                </motion.div>
+              ))}
+              <a
+                href="#cta-end"
+                className="inline-flex items-center gap-2 text-sm tracking-[0.18em] uppercase opacity-85 hover:opacity-100 transition-opacity"
+                style={{ fontFamily: "var(--font-body)" }}
               >
-                <div className="relative overflow-hidden bg-[var(--gray-900)] aspect-[3/4] mb-3 sm:mb-4 rounded-sm">
-                  <img
-                    src={product.img}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:contrast-125"
-                  />
-                  <div className="absolute inset-0 bg-[var(--deep-black)] opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-                </div>
-                <div style={{ fontFamily: "var(--font-body)" }}>
-                  <h3 className="text-xs sm:text-sm tracking-[0.12em] mb-1 font-light">{product.name}</h3>
-                  <p className="text-xs sm:text-sm tracking-wider opacity-70">{product.price}</p>
-                </div>
-              </motion.div>
-            ))}
+                Shop Full Collection <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </motion.div>
       </section>
 
+      {/* Typography Statement Section */}
+      <section className="relative py-24 sm:py-36 px-4 sm:px-8 lg:px-16 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.08),transparent_55%)]" />
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1.2 }}
+          viewport={{ once: true }}
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            maskImage: "radial-gradient(circle at center, black 40%, transparent 85%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
+        />
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 0.32, scale: 1 }}
+          transition={{ duration: 1.1 }}
+          viewport={{ once: true }}
+          className="absolute -top-24 -left-16 w-72 h-72 rounded-full blur-3xl bg-[rgba(255,255,255,0.08)]"
+        />
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 0.24, scale: 1 }}
+          transition={{ duration: 1.1, delay: 0.15 }}
+          viewport={{ once: true }}
+          className="absolute -bottom-28 -right-20 w-80 h-80 rounded-full blur-3xl bg-[rgba(255,255,255,0.06)]"
+        />
+        <div className="absolute inset-0 pointer-events-none">
+          {[
+            { text: "UTILITY FIT", pos: "top-[20%] left-[8%]" },
+            { text: "HEAVY GSM", pos: "top-[32%] right-[10%]" },
+            { text: "LIMITED DROP", pos: "bottom-[28%] left-[12%]" },
+            { text: "CITY UNIFORM", pos: "bottom-[20%] right-[12%]" },
+          ].map((tag, idx) => (
+            <motion.span
+              key={tag.text}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 0.34, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 * idx }}
+              viewport={{ once: true }}
+              className={`absolute ${tag.pos} hidden md:block text-xs tracking-[0.24em]`}
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              {tag.text}
+            </motion.span>
+          ))}
+        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2 }}
+          viewport={{ once: true }}
+          className="max-w-[1320px] mx-auto text-center relative z-10"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 0.9, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="mb-4 sm:mb-6"
+          >
+            <span
+              className="inline-flex items-center px-3 py-1 border border-[rgba(255,255,255,0.28)] text-[10px] sm:text-xs tracking-[0.22em]"
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              STUDIO DENY DNA
+            </span>
+          </motion.div>
+          <h2
+            className="text-[clamp(2.8rem,16vw,11rem)] leading-[0.82] tracking-[-0.05em] uppercase"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            STREET
+            <br />
+            <span className="text-transparent" style={{ WebkitTextStroke: "2px var(--pure-white)" }}>
+              IS
+            </span>
+            <br />
+            IDENTITY
+          </h2>
+        </motion.div>
+      </section>
+
       {/* Mid Page CTA */}
-      <section className="px-4 sm:px-8 lg:px-16 py-6 sm:py-10">
+      <section className="py-20 sm:py-28">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
-          className="max-w-[1320px] mx-auto border border-[var(--gray-800)] bg-[rgba(255,255,255,0.02)] p-5 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
         >
           <div>
-            <h3 className="text-2xl sm:text-4xl tracking-[-0.02em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
-              MEMBERS GET FIRST ACCESS
+            <p className="text-xs tracking-[0.18em] uppercase opacity-65 mb-2" style={{ fontFamily: "var(--font-body)" }}>
+              Private Access
+            </p>
+            <h3 className="text-[clamp(2rem,7vw,5rem)] leading-[0.9] tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+              MEMBERS
+              <br />
+              GET FIRST LOOK
             </h3>
-            <p className="text-base mt-2 opacity-80" style={{ fontFamily: "var(--font-body)" }}>
-              Join the list for private drops and restock alerts.
+            <p className="text-base mt-3 opacity-80 max-w-md" style={{ fontFamily: "var(--font-body)" }}>
+              Drop alerts and early windows for limited releases.
             </p>
           </div>
           <a
             href="#cta-end"
-            className="inline-flex items-center justify-center min-h-11 px-6 py-3 border border-[var(--pure-white)] bg-[var(--pure-white)] text-[var(--deep-black)] text-sm tracking-[0.14em] hover:bg-transparent hover:text-[var(--pure-white)] transition-colors duration-300"
+            className="inline-flex items-center gap-2 text-sm tracking-[0.18em] uppercase opacity-85 hover:opacity-100 transition-opacity min-h-11"
             style={{ fontFamily: "var(--font-body)" }}
           >
-            JOIN WAITLIST
+            Join Waitlist <ArrowRight className="w-4 h-4" />
           </a>
         </motion.div>
       </section>
 
       {/* Lookbook Section */}
-      <section id="lookbook" className="py-14 sm:py-20 px-4 sm:px-8 lg:px-16 bg-[rgba(255,255,255,0.01)]">
-        <div className="max-w-[1320px] mx-auto">
+      <section id="lookbook" ref={lookbookRef} className="py-14 sm:py-20 bg-[rgba(255,255,255,0.01)]">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-8 lg:px-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -265,94 +380,96 @@ export default function App() {
               Swipe through curated fits built for daily movement.
             </p>
           </motion.div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {/* Lookbook Image 1 */}
+        <div className="space-y-10 sm:space-y-16">
+          {/* Lookbook Image 1 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            viewport={{ once: true }}
+            className="relative h-[72vh] sm:h-[86vh] overflow-hidden"
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-              viewport={{ once: true }}
-              className="relative h-[58vh] sm:h-[64vh] min-h-[360px] overflow-hidden rounded-sm"
-            >
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1762666167416-72b1540a76b7?w=1400&q=80')`,
-                  transform: `translateY(${scrollY * 0.15}px)`,
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--deep-black)] via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-5 sm:bottom-8 sm:left-8 z-10">
-                <motion.p
-                  initial={{ opacity: 0, x: -40 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  viewport={{ once: true }}
-                  className="text-[clamp(1.8rem,8vw,4rem)] leading-none tracking-[-0.04em] uppercase"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  SS26
-                  <br />
-                  COLLECTION
-                </motion.p>
-              </div>
+              className="absolute inset-x-0 -inset-y-14 bg-cover bg-center"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1762666167416-72b1540a76b7?w=1920&q=80')`,
+                y: lookbookParallaxA,
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--deep-black)] via-transparent to-transparent" />
+            <motion.div className="absolute bottom-8 left-4 sm:bottom-14 sm:left-8 lg:left-16 z-10" style={{ x: lookbookTextA }}>
+              <motion.p
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="text-[clamp(2.2rem,9vw,8rem)] leading-none tracking-[-0.04em] uppercase"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                SS26
+                <br />
+                COLLECTION
+              </motion.p>
             </motion.div>
+          </motion.div>
 
-            {/* Lookbook Image 2 */}
+          {/* Lookbook Image 2 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            viewport={{ once: true }}
+            className="relative h-[72vh] sm:h-[86vh] overflow-hidden"
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-              viewport={{ once: true }}
-              className="relative h-[58vh] sm:h-[64vh] min-h-[360px] overflow-hidden rounded-sm"
-            >
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1762052508086-59f97070092c?w=1400&q=80')`,
-                  transform: `translateY(${scrollY * 0.1}px)`,
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[var(--deep-black)] via-transparent to-transparent" />
-              <div className="absolute top-6 right-5 sm:top-8 sm:right-8 z-10 text-right">
-                <motion.p
-                  initial={{ opacity: 0, x: 40 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  viewport={{ once: true }}
-                  className="text-[clamp(1.8rem,8vw,4rem)] leading-none tracking-[-0.04em] uppercase"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  URBAN
-                  <br />
-                  ESSENTIALS
-                </motion.p>
-              </div>
+              className="absolute inset-x-0 -inset-y-14 bg-cover bg-center"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1762052508086-59f97070092c?w=1920&q=80')`,
+                y: lookbookParallaxB,
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[var(--deep-black)] via-transparent to-transparent" />
+            <motion.div className="absolute top-8 right-4 sm:top-14 sm:right-8 lg:right-16 z-10 text-right" style={{ x: lookbookTextB }}>
+              <motion.p
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="text-[clamp(2.2rem,9vw,8rem)] leading-none tracking-[-0.04em] uppercase"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                URBAN
+                <br />
+                ESSENTIALS
+              </motion.p>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-14 sm:py-18 px-4 sm:px-8 lg:px-16">
-        <div className="max-w-[1320px] mx-auto">
+      {/* Proof Section */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="mb-8"
+            className="mb-10 sm:mb-14"
           >
-            <h2 className="text-[clamp(2rem,8vw,4rem)] leading-none tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
-              COMMUNITY FEEDBACK
+            <h2 className="text-[clamp(2.1rem,8vw,5.2rem)] leading-[0.9] tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+              WORN IN
+              <br />
+              EVERY CITY
             </h2>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10">
             {[
-              "Fit is unreal. It feels premium without trying too hard.",
-              "Finally a brand that understands cut, fabric, and movement.",
-              "Every drop sells out for a reason. Quality is consistent.",
+              "“Fit is unreal. It feels premium without trying too hard.”",
+              "“Finally a brand that understands cut, fabric, and movement.”",
+              "“Every drop sells out for a reason. Quality is consistent.”",
             ].map((quote, idx) => (
               <motion.div
                 key={quote}
@@ -360,15 +477,15 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 viewport={{ once: true }}
-                className="border border-[var(--gray-800)] p-5 sm:p-6 bg-[rgba(255,255,255,0.02)]"
+                className="space-y-4"
               >
-                <div className="flex gap-1 mb-3">
+                <div className="flex gap-1">
                   {[0, 1, 2, 3, 4].map((n) => (
-                    <Star key={n} className="w-3.5 h-3.5 fill-current" />
+                    <Star key={n} className="w-3.5 h-3.5 fill-current opacity-90" />
                   ))}
                 </div>
-                <p className="text-base leading-relaxed opacity-90" style={{ fontFamily: "var(--font-body)" }}>
-                  "{quote}"
+                <p className="text-lg sm:text-xl leading-relaxed opacity-90" style={{ fontFamily: "var(--font-display)" }}>
+                  {quote}
                 </p>
                 <p className="text-xs tracking-[0.15em] opacity-60 mt-4" style={{ fontFamily: "var(--font-body)" }}>
                   VERIFIED BUYER
@@ -405,28 +522,27 @@ export default function App() {
       </section>
 
       {/* Final CTA */}
-      <section id="cta-end" className="py-14 sm:py-20 px-4 sm:px-8 lg:px-16">
+      <section id="cta-end" className="py-20 sm:py-28">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
-          className="max-w-[1320px] mx-auto text-center border border-[var(--gray-800)] p-8 sm:p-12"
+          className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 text-center"
         >
-          <h2 className="text-[clamp(2rem,8vw,4rem)] leading-none tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+          <h2 className="text-[clamp(2.3rem,9vw,6rem)] leading-[0.88] tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
             READY FOR THE NEXT DROP?
           </h2>
-          <p className="text-base sm:text-lg mt-4 opacity-80 max-w-2xl mx-auto" style={{ fontFamily: "var(--font-body)" }}>
+          <p className="text-base sm:text-lg mt-4 opacity-80 max-w-xl mx-auto" style={{ fontFamily: "var(--font-body)" }}>
             Be first in line when new pieces launch. No spam, just access.
           </p>
-          <div className="mt-6 flex justify-center">
-            <button
-              className="min-h-11 px-8 py-3 border border-[var(--pure-white)] bg-[var(--pure-white)] text-[var(--deep-black)] text-sm tracking-[0.14em] hover:bg-transparent hover:text-[var(--pure-white)] transition-colors duration-300"
-              style={{ fontFamily: "var(--font-body)" }}
-            >
-              GET EARLY ACCESS
-            </button>
-          </div>
+          <a
+            href="#"
+            className="mt-6 inline-flex items-center gap-2 text-sm tracking-[0.2em] uppercase opacity-90 hover:opacity-100 transition-opacity min-h-11"
+            style={{ fontFamily: "var(--font-body)" }}
+          >
+            Get Early Access <ArrowRight className="w-4 h-4" />
+          </a>
         </motion.div>
       </section>
 
