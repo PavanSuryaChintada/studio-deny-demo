@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, useSpring } from "motion/react";
-import { Instagram, Facebook, Twitter, ArrowRight, ArrowLeft, ChevronDown, Star } from "lucide-react";
+import { Instagram, Facebook, Twitter, ArrowRight, ArrowLeft, ChevronDown, Star, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef, type MouseEvent } from "react";
 
 export default function App() {
@@ -7,6 +7,7 @@ export default function App() {
   const [activeShowcase, setActiveShowcase] = useState("NEW DROP");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const heroParallax = Math.min(scrollY * 0.4, 120);
   const shopRef = useRef<HTMLElement | null>(null);
   const lookbookRef = useRef<HTMLElement | null>(null);
@@ -305,6 +306,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileNavOpen]);
+
+  useEffect(() => {
     if (currentPath === "/new-drop") {
       setActiveShowcase("NEW DROP");
       setCategoriesOpen(false);
@@ -323,11 +333,13 @@ export default function App() {
 
   const navigateTo = (path: string) => {
     if (window.location.pathname === path) return;
+    setMobileNavOpen(false);
     window.history.pushState({}, "", path);
     setCurrentPath(path);
   };
 
   const goBack = () => {
+    setMobileNavOpen(false);
     if (window.history.length > 1) {
       window.history.back();
     } else {
@@ -348,6 +360,9 @@ export default function App() {
   const routeCtaLabel = activePageData?.ctaLabel ?? "View Shop";
   const routeCtaPath = activePageData?.ctaPath ?? "/shop";
 
+  /** Solid bar: inner routes, scrolled home, or open mobile menu — avoids mix-blend-difference staying on while scrolling the homepage */
+  const navUseSolidBar = !isHomeRoute || scrollY > 12 || mobileNavOpen;
+
   return (
     <div className="bg-[var(--deep-black)] text-[var(--pure-white)] overflow-x-hidden">
       {/* Navigation */}
@@ -355,53 +370,107 @@ export default function App() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 lg:px-16 py-4 sm:py-6 flex justify-between items-center transition-[background,backdrop-filter] duration-300 ${
-          !isHomeRoute && scrollY > 12 ? "bg-[rgba(10,10,10,0.78)] backdrop-blur-md mix-blend-normal" : "mix-blend-difference"
+        className={`fixed top-0 left-0 right-0 z-[100] flex flex-col transition-[background,backdrop-filter] duration-300 ${
+          navUseSolidBar ? "bg-[rgba(10,10,10,0.82)] backdrop-blur-md mix-blend-normal border-b border-white/[0.06]" : "mix-blend-difference"
         }`}
       >
-        <a
-          href="/"
-          onClick={(e) => {
-            e.preventDefault();
-            navigateTo("/");
-          }}
-          className="tracking-[-0.02em] hover:opacity-80 transition-opacity"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
-          <span className="text-[1.65rem] sm:text-[2.5rem] leading-none">STUDIO DENY</span>
-        </a>
-        <div className="hidden sm:flex gap-6 lg:gap-8 items-center" style={{ fontFamily: "var(--font-body)" }}>
+        <div className="flex w-full items-center justify-between px-4 sm:px-8 lg:px-16 py-4 sm:py-6">
           <a
-            href="#shop"
+            href="/"
             onClick={(e) => {
               e.preventDefault();
-              navigateHomeSection("shop");
+              setMobileNavOpen(false);
+              navigateTo("/");
             }}
-            className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            className="tracking-[-0.02em] hover:opacity-80 transition-opacity"
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            SHOP
+            <span className="text-[1.65rem] sm:text-[2.5rem] leading-none">STUDIO DENY</span>
           </a>
-          <a
-            href="#lookbook"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateHomeSection("lookbook");
-            }}
-            className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+          <div className="hidden sm:flex gap-6 lg:gap-8 items-center" style={{ fontFamily: "var(--font-body)" }}>
+            <a
+              href="#shop"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateHomeSection("shop");
+              }}
+              className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            >
+              SHOP
+            </a>
+            <a
+              href="#lookbook"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateHomeSection("lookbook");
+              }}
+              className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            >
+              LOOKBOOK
+            </a>
+            <a
+              href="#about"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateHomeSection("about");
+              }}
+              className="text-sm tracking-wide hover:opacity-60 transition-opacity"
+            >
+              ABOUT
+            </a>
+          </div>
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-sm sm:hidden -mr-1 text-white hover:bg-white/10 transition-colors"
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-nav-panel"
+            aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileNavOpen((o) => !o)}
           >
-            LOOKBOOK
-          </a>
-          <a
-            href="#about"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateHomeSection("about");
-            }}
-            className="text-sm tracking-wide hover:opacity-60 transition-opacity"
-          >
-            ABOUT
-          </a>
+            {mobileNavOpen ? <X className="h-6 w-6" strokeWidth={1.5} /> : <Menu className="h-6 w-6" strokeWidth={1.5} />}
+          </button>
         </div>
+        {mobileNavOpen ? (
+          <div
+            id="mobile-nav-panel"
+            className="flex flex-col gap-1 border-t border-white/[0.08] px-4 pb-5 pt-2 sm:hidden"
+            style={{ fontFamily: "var(--font-body)" }}
+          >
+            <a
+              href="#shop"
+              className="py-3 text-sm tracking-wide"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileNavOpen(false);
+                navigateHomeSection("shop");
+              }}
+            >
+              SHOP
+            </a>
+            <a
+              href="#lookbook"
+              className="py-3 text-sm tracking-wide"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileNavOpen(false);
+                navigateHomeSection("lookbook");
+              }}
+            >
+              LOOKBOOK
+            </a>
+            <a
+              href="#about"
+              className="py-3 text-sm tracking-wide"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileNavOpen(false);
+                navigateHomeSection("about");
+              }}
+            >
+              ABOUT
+            </a>
+          </div>
+        ) : null}
       </motion.nav>
 
       {isHomeRoute ? (
@@ -1098,7 +1167,7 @@ export default function App() {
           initial={{ y: 120, opacity: 0 }}
           animate={{ y: scrollY > 420 ? 0 : 120, opacity: scrollY > 420 ? 1 : 0 }}
           transition={{ duration: 0.3 }}
-          className="sm:hidden fixed bottom-4 left-4 right-4 z-50 min-h-11 px-6 py-3 border border-[var(--pure-white)] bg-[var(--pure-white)] text-[var(--deep-black)] text-sm tracking-[0.14em] inline-flex items-center justify-center"
+          className="sm:hidden fixed bottom-4 left-4 right-4 z-40 min-h-11 px-6 py-3 border border-[var(--pure-white)] bg-[var(--pure-white)] text-[var(--deep-black)] text-sm tracking-[0.14em] inline-flex items-center justify-center"
           style={{ fontFamily: "var(--font-body)" }}
         >
           SHOP THE DROP
