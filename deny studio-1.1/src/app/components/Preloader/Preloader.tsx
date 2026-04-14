@@ -20,6 +20,8 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
 
   // Motion Variants
   const containerVariants = {
+    initial: { opacity: 1 },
+    animate: { opacity: 1 },
     exit: {
       y: "-100%",
       transition: {
@@ -28,6 +30,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
       }
     }
   };
+
 
   const heroVariants = {
     initial: { scale: 0.8, opacity: 0, rotate: -3 },
@@ -50,7 +53,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
       opacity: 1, 
       rotate: -12,
       transition: { 
-        type: "spring",
+        type: "spring" as const,
         stiffness: 200,
         damping: 10,
         delay: 1.2
@@ -70,21 +73,21 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
           animate="animate"
           exit="exit"
         >
-          {/* Background Marquees (The "Funky" Energy) */}
+          {/* Background Marquees */}
           <div className="marquee-container">
             <div className="marquee-row animate-left">
               {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i}>{marqueeText}</span>
+                <span key={`mar-left-${i}`}>{marqueeText}</span>
               ))}
             </div>
             <div className="marquee-row filled animate-right">
               {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i}>{marqueeText}</span>
+                <span key={`mar-right-${i}`}>{marqueeText}</span>
               ))}
             </div>
             <div className="marquee-row animate-left">
               {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i}>{marqueeText}</span>
+                <span key={`mar-left-2-${i}`}>{marqueeText}</span>
               ))}
             </div>
           </div>
@@ -103,17 +106,19 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
               className="street-title"
               variants={heroVariants}
             >
-              <motion.span>DENY</motion.span>
+              <span>DENY</span>
               <motion.span 
                 className="accent-word"
+                style={{ display: "block" }}
                 animate={{ scale: [1, 1.05, 1], rotate: [0, 1, 0] }}
                 transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 1 }}
               >
                 THE
               </motion.span>
-              <motion.span>ORDINARY</motion.span>
+              <span>ORDINARY</span>
             </motion.h1>
           </div>
+
 
           {/* Bottom Barcode Decorative */}
           <div className="barcode-visual" />
