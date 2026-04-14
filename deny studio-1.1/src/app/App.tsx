@@ -578,29 +578,49 @@ export default function App() {
         </motion.div>
       </section>
 
-      {/* Editorial Marquee */}
-      <section className="py-5 sm:py-6 border-y border-[rgba(255,255,255,0.16)] overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-          className="whitespace-nowrap flex gap-8 sm:gap-12 text-xs sm:text-sm tracking-[0.2em] uppercase opacity-70"
-          style={{ fontFamily: "var(--font-body)" }}
-        >
-          {Array.from({ length: 3 }).map((_, row) => (
-            <span key={row} className="inline-flex gap-8 sm:gap-12">
-              <span>STUDIO DENY</span>
-              <span>NEW SEASON</span>
-              <span>LIMITED EDITION</span>
-              <span>URBAN TAILORING</span>
-              <span>STREET LUXE</span>
-              <span>STUDIO DENY</span>
-              <span>NEW SEASON</span>
-            </span>
+
+      {/* Notification Ticker Marquee */}
+      <section className="relative border-y border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] overflow-hidden" style={{ fontFamily: "var(--font-body)" }}>
+        <div className="flex">
+          {/* Animated Track — duplicated for seamless infinite loop */}
+          {[0, 1].map((dup) => (
+            <div
+              key={dup}
+              aria-hidden={dup === 1}
+              className="flex shrink-0 items-center"
+              style={{
+                animation: "ticker-scroll 35s linear infinite",
+                willChange: "transform",
+              }}
+            >
+              {[
+                { dot: "#ffffff", label: "NEW DROP", text: "SS26 Studio Bomber & Cargo Set — Available Now" },
+                { dot: "#888888", label: "RESTOCK", text: "Essential Hoodie in Black & Slate — Limited Units" },
+                { dot: "#ffffff", label: "ALERT", text: "Members get 48-hr early access to next drop" },
+                { dot: "#888888", label: "UPDATE", text: "Free delivery on orders over $150 this week only" },
+                { dot: "#ffffff", label: "DROP", text: "Wide Leg Denim — Only 12 units left" },
+                { dot: "#888888", label: "NEWS", text: "Studio Deny lookbook SS26 — Now Live" },
+                { dot: "#ffffff", label: "RESTOCK", text: "Signature Knit returning FW26 — Join Waitlist" },
+              ].map((item, i) => (
+                <span key={i} className="inline-flex items-center gap-3 px-8 py-3 whitespace-nowrap text-[11px] sm:text-xs tracking-[0.18em] uppercase">
+                  <span
+                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: item.dot, boxShadow: `0 0 6px ${item.dot}` }}
+                  />
+                  <span className="opacity-40">{item.label}</span>
+                  <span className="opacity-80">{item.text}</span>
+                  <span className="opacity-20 mx-2">•</span>
+                </span>
+              ))}
+            </div>
           ))}
-        </motion.div>
+        </div>
+
+        {/* Left/Right Gradient Fade */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[var(--deep-black)] to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[var(--deep-black)] to-transparent z-10" />
       </section>
+
 
       {/* Collection Section */}
       <section id="shop" ref={shopRef} className="relative py-16 sm:py-24">
