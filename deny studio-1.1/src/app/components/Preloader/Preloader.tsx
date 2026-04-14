@@ -8,60 +8,59 @@ interface PreloaderProps {
 
 const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      if (onLoadingComplete) onLoadingComplete();
-    }, 2800);
+    const duration = 2400; // Total duration in ms
+    const interval = 20; // Update every 20ms
+    const totalSteps = duration / interval;
+    let currentStep = 0;
 
-    return () => clearTimeout(timer);
+    const progressTimer = setInterval(() => {
+      currentStep++;
+      const nextProgress = Math.min(Math.round((currentStep / totalSteps) * 100), 100);
+      setProgress(nextProgress);
+      
+      if (nextProgress >= 100) {
+        clearInterval(progressTimer);
+        setTimeout(() => {
+          setIsVisible(false);
+          if (onLoadingComplete) onLoadingComplete();
+        }, 400);
+      }
+    }, interval);
+
+    return () => clearInterval(progressTimer);
   }, [onLoadingComplete]);
 
-  // Motion Variants
+  // Animation Variants
   const containerVariants = {
-    initial: { opacity: 1 },
-    animate: { opacity: 1 },
     exit: {
       y: "-100%",
       transition: {
-        duration: 0.8,
-        ease: [0.87, 0, 0.13, 1]
+        duration: 0.9,
+        ease: [0.82, 0, 0.18, 1],
+        delay: 0.2
       }
     }
   };
 
-
-  const heroVariants = {
-    initial: { scale: 0.8, opacity: 0, rotate: -3 },
+  const textVariants = {
+    initial: { opacity: 0, y: 20 },
     animate: { 
-      scale: 1, 
       opacity: 1, 
-      rotate: 0,
-      transition: { 
-        duration: 0.6, 
-        ease: "backOut",
-        delay: 0.4
-      } 
+      y: 0,
+      transition: { duration: 0.8, ease: "circOut" }
     }
   };
 
-  const stickerVariants = {
-    initial: { x: -100, opacity: 0, rotate: 0 },
+  const lineVariants = {
+    initial: { scaleX: 0 },
     animate: { 
-      x: 0, 
-      opacity: 1, 
-      rotate: -12,
-      transition: { 
-        type: "spring" as const,
-        stiffness: 200,
-        damping: 10,
-        delay: 1.2
-      } 
+      scaleX: 1,
+      transition: { duration: 1.2, ease: "expoOut", delay: 0.3 }
     }
   };
-
-  const marqueeText = "STUDIO DENY • STREETWEAR DEPT • COLLECTIONS 2025 • ";
 
   return (
     <AnimatePresence>
@@ -73,79 +72,88 @@ const Preloader: React.FC<PreloaderProps> = ({ onLoadingComplete }) => {
           animate="animate"
           exit="exit"
         >
-          {/* Background Marquees */}
-          <div className="marquee-container">
-            <div className="marquee-row animate-left">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={`mar-left-${i}`}>{marqueeText}</span>
-              ))}
-            </div>
-            <div className="marquee-row filled animate-right">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={`mar-right-${i}`}>{marqueeText}</span>
-              ))}
-            </div>
-            <div className="marquee-row animate-left">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={`mar-left-2-${i}`}>{marqueeText}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* Premium Sticker Tag */}
-          <motion.div 
-            className="sticker-tag"
-            variants={stickerVariants}
-          >
-            VERIFIED_CULTURE // Q1-2025
-          </motion.div>
-
-          {/* Hero Content */}
-          <div className="hero-wrapper">
-            <motion.h1 
-              className="street-title"
-              variants={heroVariants}
-            >
-              <span>DENY</span>
-              <motion.span 
-                className="accent-word"
-                style={{ display: "block" }}
-                animate={{ scale: [1, 1.05, 1], rotate: [0, 1, 0] }}
-                transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 1 }}
-              >
-                THE
-              </motion.span>
-              <span>ORDINARY</span>
-            </motion.h1>
-          </div>
-
-
-          {/* Bottom Barcode Decorative */}
-          <div className="barcode-visual" />
+          {/* Technical Background */}
+          <div className="technical-grid" />
           
-          {/* Status Bar */}
-          <motion.div 
-            className="status-bar"
-            style={{
-              position: 'absolute',
-              bottom: '50px',
-              fontFamily: 'JetBrains Mono',
-              fontSize: '10px',
-              letterSpacing: '0.3em',
-              opacity: 0.5
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            transition={{ delay: 0.8 }}
-          >
-            PARSING_IDENTITY... [OK]
-          </motion.div>
+          <div className="geo-frame">
+            <div className="geo-frame-top-left" />
+            <div className="geo-frame-top-right" />
+            <div className="geo-frame-bottom-left" />
+            <div className="geo-frame-bottom-right" />
+          </div>
 
-          {/* Acid Flash on Exit */}
+          {/* Central Stage */}
+          <div className="main-stage">
+            <div className="logo-container">
+              {/* Measurement lines */}
+              <div className="measurement-lines">
+                <div className="line-v" style={{ left: '0' }} />
+                <div className="line-v" style={{ right: '0' }} />
+                <div className="line-h" style={{ top: '0' }} />
+                <div className="line-h" style={{ bottom: '0' }} />
+              </div>
+
+              <motion.h1 
+                className="brand-text"
+                variants={textVariants}
+              >
+                <span>STUDIO</span>
+                <span style={{ marginLeft: '1.5rem' }}>DENY</span>
+              </motion.h1>
+
+              <motion.div 
+                className="scan-line"
+                animate={{ 
+                  top: ["0%", "100%", "0%"] 
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "linear" 
+                }}
+              />
+            </div>
+
+            <div className="metadata-stage">
+              <motion.div 
+                className="metadata"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                SYSTEM_AUTH: <span className="progress-counter">{progress}%</span>
+              </motion.div>
+              
+              <motion.div 
+                className="metadata"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                style={{ marginTop: '5px' }}
+              >
+                LOC: ARCHIVE_V1.1 // SS26
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Bottom Branding */}
+          <div 
+            className="metadata"
+            style={{ 
+              position: 'absolute', 
+              bottom: '40px', 
+              textAlign: 'center',
+              width: '100%'
+            }}
+          >
+            NOT FOR THE ORDINARY
+          </div>
+
+          {/* Exit Flash */}
           <motion.div 
             className="exit-flash"
             exit={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4 }}
           />
         </motion.div>
       )}

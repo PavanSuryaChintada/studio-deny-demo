@@ -364,7 +364,6 @@ export default function App() {
   const routeCtaLabel = activePageData?.ctaLabel ?? "View Shop";
   const routeCtaPath = activePageData?.ctaPath ?? "/shop";
 
-<<<<<<< HEAD
   useEffect(() => {
     if (isLoading || mobileNavOpen) {
       document.body.style.overflow = "hidden";
