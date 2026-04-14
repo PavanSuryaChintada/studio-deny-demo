@@ -49,17 +49,17 @@ export default function App() {
   });
   const showcaseContent: Record<string, { image: string; eyebrow: string; caption: string }> = {
     "NEW DROP": {
-      image: "https://images.unsplash.com/photo-1675079506513-f0a5eb0fd788?w=1800&q=80",
+      image: "/assets/001_1.JPG",
       eyebrow: "Latest Arrival",
       caption: "Fresh silhouettes, clean tailoring, and statement layers for this season.",
     },
     "BEST SELLING": {
-      image: "https://images.unsplash.com/photo-1718340803554-3a7af7253aa8?w=1800&q=80",
+      image: "/assets/001_6.JPG",
       eyebrow: "Most Wanted",
       caption: "The pieces our community wears on repeat across every city.",
     },
     CATEGORIES: {
-      image: "https://images.unsplash.com/photo-1552337480-48918be048b9?w=1800&q=80",
+      image: "/assets/001_10.JPG",
       eyebrow: "Browse By Mood",
       caption: "Explore by fit and identity with a minimalist, editorial navigation flow.",
     },
@@ -81,10 +81,10 @@ export default function App() {
     "/new-drop": {
       title: "NEW DROP",
       subtitle: "Fresh silhouettes and elevated essentials for this season.",
-      hero: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=2200&q=80",
+      hero: "/assets/001_12.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1675079506513-f0a5eb0fd788?w=1800&q=80",
-        "https://images.unsplash.com/photo-1718340803554-3a7af7253aa8?w=1800&q=80",
+        "/assets/001_1.JPG",
+        "/assets/001_6.JPG",
       ],
       highlightCaption: "Limited run. Precision cut. Built for the street.",
       products: [
@@ -115,10 +115,10 @@ export default function App() {
     "/best-selling": {
       title: "BEST SELLING",
       subtitle: "Most wanted pieces worn across cities and seasons.",
-      hero: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=2200&q=80",
+      hero: "/assets/001_13.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1559590450-fc29d6207936?w=1800&q=80",
-        "https://images.unsplash.com/photo-1552337480-48918be048b9?w=1800&q=80",
+        "/assets/001_14.JPG",
+        "/assets/001_18.JPG",
       ],
       highlightCaption: "The silhouettes that define the Studio uniform.",
       products: [
@@ -149,10 +149,10 @@ export default function App() {
     "/shop": {
       title: "SHOP",
       subtitle: "A refined selection of studio essentials and statement pieces.",
-      hero: "https://images.unsplash.com/photo-1516826957135-700dedea698c?w=2200&q=80",
+      hero: "/assets/001_14.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1620223765052-d38678bcce1a?w=1800&q=80",
-        "https://images.unsplash.com/photo-1673118306649-a74a253c5733?w=1800&q=80",
+        "/assets/001_10.JPG",
+        "/assets/001_12.JPG",
       ],
       highlightCaption: "Navigate by category. One visual language end to end.",
       products: [
@@ -188,10 +188,10 @@ export default function App() {
     men: {
       title: "MEN",
       subtitle: "Tailored streetwear essentials with confident silhouettes.",
-      hero: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=2200&q=80",
+      hero: "/assets/001_12.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1800&q=80",
-        "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=1800&q=80",
+        "/assets/001_1.JPG",
+        "/assets/001_6.JPG",
       ],
       highlightCaption: "Sharp lines. Quiet confidence. Built for the city.",
       products: [
@@ -204,10 +204,10 @@ export default function App() {
     women: {
       title: "WOMEN",
       subtitle: "Modern cuts with soft structure and strong attitude.",
-      hero: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=2200&q=80",
+      hero: "/assets/001_13.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1800&q=80",
-        "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=1800&q=80",
+        "/assets/001_10.JPG",
+        "/assets/001_14.JPG",
       ],
       highlightCaption: "Texture, drape, and proportion in balance.",
       products: [
@@ -220,10 +220,10 @@ export default function App() {
     kids: {
       title: "KIDS",
       subtitle: "Play-ready essentials with bold studio identity.",
-      hero: "https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=2200&q=80",
+      hero: "/assets/001_14.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?w=1800&q=80",
-        "https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=1800&q=80",
+        "/assets/001_18.JPG",
+        "/assets/001_1.JPG",
       ],
       highlightCaption: "Durable fabrics. Easy movement. Same studio DNA.",
       products: [
@@ -236,10 +236,10 @@ export default function App() {
     street: {
       title: "STREET",
       subtitle: "Underground-inspired essentials for everyday movement.",
-      hero: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=2200&q=80",
+      hero: "/assets/001_18.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1603344797033-f0f4f587ab60?w=1800&q=80",
-        "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?w=1800&q=80",
+        "/assets/001_6.JPG",
+        "/assets/001_10.JPG",
       ],
       highlightCaption: "Utility layers. Heavy texture. Zero noise.",
       products: [
@@ -252,10 +252,10 @@ export default function App() {
     jeans: {
       title: "JEANS",
       subtitle: "Relaxed, tapered, and oversized denim for every fit mood.",
-      hero: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=2200&q=80",
+      hero: "/assets/001_1.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1475178626620-a4d074967452?w=1800&q=80",
-        "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1800&q=80",
+        "/assets/001_12.JPG",
+        "/assets/001_13.JPG",
       ],
       highlightCaption: "Wash, weight, and break-in—editorial denim.",
       products: [
@@ -268,10 +268,10 @@ export default function App() {
     shirts: {
       title: "SHIRTS",
       subtitle: "Clean construction and premium texture for layered looks.",
-      hero: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=2200&q=80",
+      hero: "/assets/001_6.JPG",
       gallery: [
-        "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=1800&q=80",
-        "https://images.unsplash.com/photo-1618354691221-88d47f285158?w=1800&q=80",
+        "/assets/001_14.JPG",
+        "/assets/001_18.JPG",
       ],
       highlightCaption: "Crisp cottons and quiet structure.",
       products: [
@@ -498,15 +498,20 @@ export default function App() {
       <>
       {/* Hero Section */}
       <section className="relative min-h-[82vh] sm:min-h-[86vh] w-full flex items-center justify-center overflow-hidden px-4 sm:px-8 lg:px-16 pt-28 sm:pt-32 pb-16">
-        {/* Background Image with Blur */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
+        {/* Background Video for Premium Feel */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1762666168682-8229f2a62305?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920')`,
-            filter: "blur(8px) brightness(0.4)",
+            filter: "brightness(0.35)",
             transform: `translateY(${heroParallax}px)`,
           }}
-        />
+        >
+          <source src="/assets/hero-video.mp4" type="video/mp4" />
+        </video>
 
         {/* Grain Texture Overlay */}
         <div
@@ -959,7 +964,7 @@ export default function App() {
             <motion.div
               className="absolute inset-x-0 -inset-y-14 bg-cover bg-center"
               style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1762666167416-72b1540a76b7?w=1920&q=80')`,
+                backgroundImage: `url('/assets/001_18.JPG')`,
                 y: lookbookParallaxA,
               }}
             />
@@ -991,7 +996,7 @@ export default function App() {
             <motion.div
               className="absolute inset-x-0 -inset-y-14 bg-cover bg-center"
               style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1762052508086-59f97070092c?w=1920&q=80')`,
+                backgroundImage: `url('/assets/001_13.JPG')`,
                 y: lookbookParallaxB,
               }}
             />
@@ -1123,12 +1128,12 @@ export default function App() {
             className="grid grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4 mb-12 sm:mb-16"
           >
             {[
-              "https://images.unsplash.com/photo-1760302318620-261f5e4d1940?w=600&q=80",
-              "https://images.unsplash.com/photo-1775592231472-6d8719ccdfe3?w=600&q=80",
-              "https://images.unsplash.com/photo-1602080243652-3c5a008e194c?w=600&q=80",
-              "https://images.unsplash.com/photo-1728997907996-b946a76e211b?w=600&q=80",
-              "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80",
-              "https://images.unsplash.com/photo-1516826957135-700dedea698c?w=600&q=80",
+              "/assets/001_1.JPG",
+              "/assets/001_6.JPG",
+              "/assets/001_10.JPG",
+              "/assets/001_12.JPG",
+              "/assets/001_13.JPG",
+              "/assets/001_14.JPG",
             ].map((img, idx) => (
               <div key={idx} className="aspect-square overflow-hidden bg-[var(--gray-900)]">
                 <img
