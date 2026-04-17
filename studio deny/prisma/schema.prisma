@@ -1,5 +1,14 @@
+// Vite app and tooling resolve @prisma/client from the repo root (studio deny/node_modules).
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+// Next.js app runs from next-app/ with its own node_modules; duplicate output prevents
+// "@prisma/client did not initialize yet" when the client is only generated one level up.
+generator clientNext {
+  provider = "prisma-client-js"
+  output   = "../next-app/node_modules/.prisma/client"
 }
 
 datasource db {
