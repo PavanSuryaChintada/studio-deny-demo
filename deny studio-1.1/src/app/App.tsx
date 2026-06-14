@@ -2,6 +2,15 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "mot
 import { Instagram, Facebook, Twitter, ArrowRight, ArrowLeft, ChevronDown, Star, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef, type MouseEvent } from "react";
 import Preloader from "./components/Preloader/Preloader";
+import FeaturedDrop from "./components/sections/FeaturedDrop";
+import NextDropCountdown from "./components/sections/NextDropCountdown";
+import BestSellers from "./components/sections/BestSellers";
+import FabricQuality from "./components/sections/FabricQuality";
+import BrandManifesto from "./components/sections/BrandManifesto";
+import DropTimeline from "./components/sections/DropTimeline";
+import CommunityGallery from "./components/sections/CommunityGallery";
+import MembersClub from "./components/sections/MembersClub";
+import MarqueeSeparator from "./components/sections/MarqueeSeparator";
 
 
 export default function App() {
@@ -583,6 +592,14 @@ export default function App() {
         </motion.div>
       </section>
 
+      {/* SECTION 9 — PREMIUM MARQUEE (directly below Hero) */}
+      <MarqueeSeparator />
+
+      {/* SECTION 1 — FEATURED DROP */}
+      <FeaturedDrop />
+
+      {/* SECTION 8 — NEXT DROP COUNTDOWN */}
+      <NextDropCountdown />
 
       {/* Notification Ticker Marquee */}
       <section className="relative border-y border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] overflow-hidden" style={{ fontFamily: "var(--font-body)" }}>
@@ -628,7 +645,7 @@ export default function App() {
 
 
       {/* Collection Section */}
-      <section id="shop" ref={shopRef} className="relative py-16 sm:py-24">
+      <section id="shop" ref={shopRef} className="relative pt-10 sm:pt-14 pb-0">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -806,8 +823,14 @@ export default function App() {
         </motion.div>
       </section>
 
+      {/* SECTION 4 — BEST SELLERS (after Collection/Categories) */}
+      <BestSellers />
+
+      {/* SECTION 9 — PREMIUM MARQUEE */}
+      <MarqueeSeparator items={["LIMITED DROP", "DESIGNED FOR CREATORS", "STUDIO DENY", "STREET CULTURE REFINED", "HEAVY GSM", "SS26"]} speed={22} />
+
       {/* Typography Statement Section */}
-      <section className="relative py-24 sm:py-36 px-4 sm:px-8 lg:px-16 overflow-hidden">
+      <section className="relative py-10 sm:py-14 px-4 sm:px-8 lg:px-16 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.08),transparent_55%)]" />
         <motion.div
           aria-hidden
@@ -901,40 +924,21 @@ export default function App() {
         </motion.div>
       </section>
 
-      {/* Mid Page CTA */}
-      <section className="py-20 sm:py-28">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-          className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
-        >
-          <div>
-            <p className="text-xs tracking-[0.18em] uppercase opacity-65 mb-2" style={{ fontFamily: "var(--font-body)" }}>
-              Private Access
-            </p>
-            <h3 className="text-[clamp(2rem,7vw,5rem)] leading-[0.9] tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
-              MEMBERS
-              <br />
-              GET FIRST LOOK
-            </h3>
-            <p className="text-base mt-3 opacity-80 max-w-md" style={{ fontFamily: "var(--font-body)" }}>
-              Drop alerts and early windows for limited releases.
-            </p>
-          </div>
-          <a
-            href="#cta-end"
-            className="inline-flex items-center gap-2 text-sm tracking-[0.18em] uppercase opacity-85 hover:opacity-100 transition-opacity min-h-11"
-            style={{ fontFamily: "var(--font-body)" }}
-          >
-            Join Waitlist <ArrowRight className="w-4 h-4" />
-          </a>
-        </motion.div>
-      </section>
+      {/* SECTION 2 — BRAND MANIFESTO */}
+      <BrandManifesto />
+
+      {/* SECTION 6 — DROP TIMELINE */}
+      <DropTimeline />
+
+
+      {/* SECTION 3 — FABRIC & QUALITY (before Lookbook) */}
+      <FabricQuality />
+
+      {/* SECTION 9 — PREMIUM MARQUEE */}
+      <MarqueeSeparator items={["PREMIUM COTTON", "HEAVYWEIGHT CONSTRUCTION", "OVERSIZED FIT", "LONG-LASTING PRINT", "STUDIO DENY"]} speed={24} />
 
       {/* Lookbook Section */}
-      <section id="lookbook" ref={lookbookRef} className="py-14 sm:py-20 bg-[rgba(255,255,255,0.01)]">
+      <section id="lookbook" ref={lookbookRef} className="pt-6 sm:pt-10 pb-8 sm:pb-12 bg-[rgba(255,255,255,0.01)]">
         <div className="max-w-[1320px] mx-auto px-4 sm:px-8 lg:px-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -952,7 +956,7 @@ export default function App() {
           </motion.div>
         </div>
 
-        <div className="space-y-10 sm:space-y-16">
+        <div className="space-y-0">
           {/* Lookbook Image 1 */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -1020,7 +1024,7 @@ export default function App() {
       </section>
 
       {/* Proof Section */}
-      <section className="py-16 sm:py-24">
+      <section className="pt-6 sm:pt-8 pb-0">
         <div className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1066,8 +1070,11 @@ export default function App() {
         </div>
       </section>
 
+      {/* SECTION 5 — COMMUNITY GALLERY */}
+      <CommunityGallery />
+
       {/* Brand Story Section */}
-      <section id="about" className="py-14 sm:py-20 px-4 sm:px-8 lg:px-16 border-y border-[var(--gray-900)] bg-[rgba(255,255,255,0.01)]">
+      <section id="about" className="py-8 sm:py-12 px-4 sm:px-8 lg:px-16 border-y border-[var(--gray-900)] bg-[rgba(255,255,255,0.01)]">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1091,8 +1098,46 @@ export default function App() {
         </motion.div>
       </section>
 
+      {/* MEMBERS GET FIRST LOOK — teaser leading into Deny Club signup */}
+      <section className="py-10 sm:py-14 border-t border-[rgba(255,255,255,0.06)]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+          className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
+        >
+          <div>
+            <p className="text-xs tracking-[0.18em] uppercase opacity-65 mb-2" style={{ fontFamily: "var(--font-body)" }}>
+              Private Access
+            </p>
+            <h3 className="text-[clamp(2rem,7vw,5rem)] leading-[0.9] tracking-[-0.03em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+              MEMBERS
+              <br />
+              GET FIRST LOOK
+            </h3>
+            <p className="text-base mt-3 opacity-80 max-w-md" style={{ fontFamily: "var(--font-body)" }}>
+              Drop alerts and early windows for limited releases.
+            </p>
+          </div>
+          <a
+            href="#members-club"
+            className="inline-flex items-center gap-2 text-sm tracking-[0.18em] uppercase opacity-85 hover:opacity-100 transition-opacity min-h-11"
+            style={{ fontFamily: "var(--font-body)" }}
+          >
+            Join Now <ArrowRight className="w-4 h-4" />
+          </a>
+        </motion.div>
+      </section>
+
+      {/* SECTION 7 — MEMBERS CLUB */}
+      <MembersClub />
+
+      {/* SECTION 9 — PREMIUM MARQUEE */}
+      <MarqueeSeparator items={["DENY CLUB", "EARLY ACCESS", "LIMITED RELEASES", "MEMBERS ONLY", "EXCLUSIVE UPDATES"]} speed={20} />
+
       {/* Final CTA */}
-      <section id="cta-end" className="py-20 sm:py-28">
+      <section id="cta-end" className="py-10 sm:py-14">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
